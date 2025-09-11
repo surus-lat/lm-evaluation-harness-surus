@@ -63,6 +63,8 @@ cd lm-evaluation-harness
 pip install -e .
 ```
 
+> **⚠️ Deployment Note**: This project has dependency conflicts between some optional dependencies. If you encounter "No solution found when resolving dependencies" errors, see our [Deployment Guide](DEPLOYMENT.md) for the proper installation method using `uv pip install -e .` instead of `uv sync`.
+
 We also provide a number of optional dependencies for extended functionality. A detailed table is available at the end of this document.
 
 ## Basic Usage

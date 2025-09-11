@@ -40,6 +40,7 @@ dependencies = [
     "word2number",
     "more_itertools",
     "sentence-transformers",
+    "wandb",
 ]
 
 [tool.setuptools.packages.find]
