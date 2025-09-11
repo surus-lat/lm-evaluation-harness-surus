@@ -1,0 +1,10 @@
+group: latam
+group_alias: latam
+task:
+  - latam_es
+aggregate_metric_list:
+  - metric: acc
+    aggregation: mean
+    weight_by_size: False
+metadata:
+  version: 1.0

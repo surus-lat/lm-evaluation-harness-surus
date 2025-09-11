@@ -1,0 +1,4 @@
+include: _teleia_template
+task: teleia_siele
+dataset_name: siele
+process_docs: !function utils.process_pce_siele

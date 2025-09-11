@@ -78,7 +78,7 @@ A list of supported tasks (or groupings of tasks) can be viewed with `lm-eval --
 To evaluate a model hosted on the [HuggingFace Hub](https://huggingface.co/models) (e.g. GPT-J-6B) on `hellaswag` you can use the following command (this assumes you are using a CUDA-compatible GPU):
 
 ```bash
-lm_eval --model hf \
+lm_eval --model hf \_
     --model_args pretrained=EleutherAI/gpt-j-6B \
     --tasks hellaswag \
     --device cuda:0 \

@@ -10,6 +10,8 @@ from typing import Callable, List, Optional, Sequence, TypeVar
 import numpy as np
 import sacrebleu
 
+from sentence_transformers import SentenceTransformer, CrossEncoder
+
 from lm_eval.api.registry import register_aggregation, register_metric
 
 
@@ -627,3 +629,66 @@ def aggregate_subtask_metrics(metrics, sizes, weight_by_size=True):
     assert len(metrics) == len(sizes)
 
     return sum([metric * size for metric, size in zip(metrics, sizes)]) / sum(sizes)
+
+
+# Custom Semantic Similarity Metrics
+def sas_encoder_hf_evaluate(predictions, references, model_name_or_path):
+    if "loaded_models" not in sas_encoder_hf_evaluate.__dict__:
+        sas_encoder_hf_evaluate.loaded_models = {}
+    if model_name_or_path not in sas_encoder_hf_evaluate.loaded_models:
+        sas_encoder_hf_evaluate.loaded_models[model_name_or_path] = SentenceTransformer(model_name_or_path)
+    sas_model = sas_encoder_hf_evaluate.loaded_models[model_name_or_path]
+    
+    # Encode predictions and references
+    preds = sas_model.encode(predictions)
+    refs = sas_model.encode(references)
+    
+    # Calculate cosine similarity for each pair
+    similarities = []
+    for pred, ref in zip(preds, refs):
+        similarity = np.dot(ref, pred) / (np.linalg.norm(pred) * np.linalg.norm(ref))
+        similarities.append(similarity)
+    
+    return {"sas_encoder": np.mean(similarities)}
+
+
+def sas_cross_encoder_hf_evaluate(predictions, references, model_name_or_path):
+    if "loaded_models" not in sas_cross_encoder_hf_evaluate.__dict__:
+        sas_cross_encoder_hf_evaluate.loaded_models = {}
+    if model_name_or_path not in sas_cross_encoder_hf_evaluate.loaded_models:
+        sas_cross_encoder_hf_evaluate.loaded_models[model_name_or_path] = CrossEncoder(model_name_or_path)
+    sas_model = sas_cross_encoder_hf_evaluate.loaded_models[model_name_or_path]
+    
+    # Create pairs for cross-encoder
+    pairs = [[pred, ref] for pred, ref in zip(predictions, references)]
+    scores = sas_model.predict(pairs)
+    
+    return {"sas_cross_encoder": np.mean(scores)}
+
+
+@register_metric(
+    metric="sas_encoder",
+    higher_is_better=True,
+    output_type="generate_until",
+    aggregation="mean",
+)
+def sas_encoder_fn(**kwargs):
+    return sas_encoder_hf_evaluate(
+        kwargs["predictions"], 
+        kwargs["references"], 
+        kwargs["model_name_or_path"]
+    )
+
+
+@register_metric(
+    metric="sas_cross_encoder",
+    higher_is_better=True,
+    output_type="generate_until",
+    aggregation="mean",
+)
+def sas_cross_encoder_fn(**kwargs):
+    return sas_cross_encoder_hf_evaluate(
+        kwargs["predictions"], 
+        kwargs["references"], 
+        kwargs["model_name_or_path"]
+    )
