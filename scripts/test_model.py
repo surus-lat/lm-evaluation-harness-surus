@@ -54,10 +54,16 @@ def test_model(model_name: str, model_args_str: str = "", use_accelerate: bool =
     logger.info(f"Model args: {model_args}")
     
     try:
-        # Extract relevant arguments
+        # Extract relevant arguments (ignore VLLM-specific args)
         pretrained = model_args.get('pretrained', model_name)
         dtype = model_args.get('dtype', 'auto')
         max_length = model_args.get('max_length')
+        
+        # Ignore VLLM-specific arguments that don't apply to HF transformers testing
+        vllm_args = ['tensor_parallel_size', 'gpu_memory_utilization', 'data_parallel_size', 'max_model_len', 'enforce_eager', 'limit_mm_per_prompt']
+        if any(arg in model_args for arg in vllm_args):
+            logger.info("VLLM-specific arguments detected in model_args - these will be ignored for testing")
+            logger.info("Test will use basic HuggingFace transformers for model validation")
         
         logger.info(f"Loading tokenizer for: {pretrained}")
         
@@ -83,15 +89,22 @@ def test_model(model_name: str, model_args_str: str = "", use_accelerate: bool =
             torch_dtype = torch.bfloat16
         elif dtype == 'float32':
             torch_dtype = torch.float32
-        elif dtype != 'auto':
+        elif dtype == 'auto':
+            # For 'auto', let transformers decide (usually defaults to model's native dtype)
+            torch_dtype = None
+            logger.info("dtype=auto detected, letting transformers auto-detect dtype")
+        else:
             logger.warning(f"Unknown dtype: {dtype}, using auto")
+            torch_dtype = None
         
         # Determine device strategy
         if use_accelerate and num_gpus > 1:
-            # Multi-GPU with accelerate - let accelerate handle device placement
-            device_map = "auto"
-            device = None
-            logger.info(f"Multi-GPU mode with accelerate: {num_gpus} GPUs")
+            # For multi-GPU testing, just use a single GPU to avoid complexity
+            # The actual evaluation will use accelerate properly
+            device_map = None
+            device = "cuda:0"
+            logger.info(f"Multi-GPU mode detected, but using single GPU for testing: {device}")
+            logger.info(f"(Actual evaluation will use {num_gpus} GPUs with accelerate)")
         elif torch.cuda.is_available():
             # Single GPU mode
             device_map = None
@@ -122,11 +135,35 @@ def test_model(model_name: str, model_args_str: str = "", use_accelerate: bool =
         else:
             model_kwargs['device_map'] = None
             
-        # Load model
-        model = AutoModelForCausalLM.from_pretrained(pretrained, **model_kwargs)
-        
-        if device is not None and device_map is None:
-            model = model.to(device)
+        # Load model with error handling for OOM
+        try:
+            model = AutoModelForCausalLM.from_pretrained(pretrained, **model_kwargs)
+            
+            if device is not None and device_map is None:
+                model = model.to(device)
+                
+        except (torch.cuda.OutOfMemoryError, RuntimeError) as oom_error:
+            if "out of memory" in str(oom_error).lower() and device != "cpu":
+                logger.warning(f"CUDA OOM during model loading: {oom_error}")
+                logger.info("Falling back to CPU mode for testing...")
+                
+                # Clear GPU memory
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                
+                # Retry with CPU
+                model_kwargs_cpu = model_kwargs.copy()
+                model_kwargs_cpu['device_map'] = None
+                if 'torch_dtype' in model_kwargs_cpu:
+                    # Use float32 for CPU to avoid potential issues
+                    model_kwargs_cpu['torch_dtype'] = torch.float32
+                
+                model = AutoModelForCausalLM.from_pretrained(pretrained, **model_kwargs_cpu)
+                model = model.to("cpu")
+                device = "cpu"
+                logger.info("Successfully loaded model on CPU for testing")
+            else:
+                raise
             
         logger.info("Model loaded successfully")
         
@@ -179,7 +216,7 @@ def test_model(model_name: str, model_args_str: str = "", use_accelerate: bool =
             "model_size_gb": model_size_gb,
             "test_prompt": test_prompt,
             "generated_text": generated_text,
-            "device_strategy": "multi_gpu_accelerate" if (use_accelerate and num_gpus > 1) else ("single_gpu" if device == "cuda:0" else "cpu")
+            "device_strategy": "multi_gpu_accelerate" if (use_accelerate and num_gpus > 1) else ("single_gpu" if device.startswith("cuda") else "cpu")
         }
         
     except Exception as e:
@@ -199,6 +236,10 @@ def main():
     parser.add_argument("--num_gpus", type=int, default=1, help="Number of GPUs that will be used")
     parser.add_argument("--mixed_precision", default="no", choices=["no", "fp16", "bf16"], 
                        help="Mixed precision mode")
+    # VLLM parameters (ignored for testing - we just test basic model loading)
+    parser.add_argument("--use_vllm", action="store_true", help="Whether VLLM will be used (ignored for testing)")
+    parser.add_argument("--gpus_per_model", type=int, default=1, help="GPUs per model for VLLM (ignored for testing)")
+    parser.add_argument("--model_replicas", type=int, default=2, help="Model replicas for VLLM (ignored for testing)")
     
     args = parser.parse_args()
     

@@ -1,8 +1,8 @@
-group: latam
-group_alias: latam
+group: latam_pr
+group_alias: latam_pr
 task:
-  - latam_es
-  - latam_pr
+  - task: portuguese_bench
+    num_fewshot: 1
 aggregate_metric_list:
   - metric: acc
     aggregation: mean
