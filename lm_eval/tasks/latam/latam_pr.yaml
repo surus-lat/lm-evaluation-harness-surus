@@ -1,11 +1,11 @@
 group: latam_pr
 group_alias: latam_pr
 task:
-  - task: portuguese_bench
+  - task: portuguese
     num_fewshot: 1
 aggregate_metric_list:
   - metric: acc
     aggregation: mean
-    weight_by_size: False
+    weight_by_size: false
 metadata:
   version: 1.0

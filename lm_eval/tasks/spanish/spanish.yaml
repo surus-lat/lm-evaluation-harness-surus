@@ -1,0 +1,17 @@
+group: spanish
+group_alias: spanish
+task:
+  - copa_es
+  - escola
+  - mgsm_direct_es_spanish_bench
+  - openbookqa_es
+  - paws_es_spanish_bench
+  - teleia
+  - wnli_es
+  - xnli_es_spanish_bench
+aggregate_metric_list:
+  - metric: acc
+    aggregation: mean
+    weight_by_size: true
+metadata:
+  version: 1.0

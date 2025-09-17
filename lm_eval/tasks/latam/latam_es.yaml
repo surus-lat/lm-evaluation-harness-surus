@@ -1,21 +1,11 @@
 group: latam_es
 group_alias: latam_es
 task:
-  - task: aquas
-    num_fewshot: 1
-  - task: ragquas
-    num_fewshot: 1
-  - task: teleia_pce
-    num_fewshot: 1
-  - task: teleia_cervantes_ave
-    num_fewshot: 1
-  - task: teleia_siele
-    num_fewshot: 1
-  - task: spanish_bench
+  - task: spanish
     num_fewshot: 1
 aggregate_metric_list:
   - metric: acc
     aggregation: mean
-    weight_by_size: False
+    weight_by_size: false
 metadata:
   version: 1.0
