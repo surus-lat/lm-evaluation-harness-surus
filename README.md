@@ -60,7 +60,7 @@ To install the `lm-eval` package from the github repository, run:
 ```bash
 git clone --depth 1 https://github.com/EleutherAI/lm-evaluation-harness
 cd lm-evaluation-harness
-pip install -e .
+pip install -e .[api]
 ```
 
 > **⚠️ Deployment Note**: This project has dependency conflicts between some optional dependencies. If you encounter "No solution found when resolving dependencies" errors, see our [Deployment Guide](DEPLOYMENT.md) for the proper installation method using `uv pip install -e .` instead of `uv sync`.

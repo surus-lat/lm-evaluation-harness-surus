@@ -4,6 +4,7 @@ output_type: multiple_choice
 training_split: train
 validation_split: validation
 test_split: null
+fewshot_split: train
 doc_to_text: "{{Sentence}}\nPregunta: ¿Tiene sentido esta frase?\nRespuesta:"
 doc_to_target: Label
 doc_to_choice: ["no", "sí"]
