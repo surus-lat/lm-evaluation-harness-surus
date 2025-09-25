@@ -52,17 +52,28 @@ def create_process_docs_function(target_language: str) -> Callable:
         # Get the target language ISO code
         tgt_iso = lang_to_iso.get(target_language, 'por')
         
+        
         # Get the full dataset (cached)
         full_dataset = get_full_flores_dataset()
         
         # Get the current split name from the dataset
-        current_split = list(dataset.keys())[0] if hasattr(dataset, 'keys') else 'dev'
+        # The dataset passed to us is already from a specific split, so we need to 
+        # determine which split it came from by looking at the dataset length
+        if len(dataset) == 997:
+            current_split = 'dev'
+        elif len(dataset) == 1012:
+            current_split = 'devtest'
+        else:
+            # Fallback to dev if we can't determine
+            current_split = 'dev'
+        
         
         # Filter the full dataset to get only target language documents
         tgt_split = full_dataset[current_split].filter(lambda x: x['iso_639_3'] == tgt_iso)
         
         # Create a lookup dictionary for faster matching
         tgt_lookup = {doc['id']: doc for doc in tgt_split}
+        
         
         # Process the dataset to create pairs
         def _process_doc(doc):
@@ -85,6 +96,7 @@ def create_process_docs_function(target_language: str) -> Callable:
             processed_doc = _process_doc(doc)
             if processed_doc is not None:
                 processed_docs.append(processed_doc)
+        
         
         return datasets.Dataset.from_list(processed_docs)
     
@@ -132,13 +144,68 @@ def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
     return process_docs_spa_to_por(dataset)
 
 
-def doc_to_text(doc):
-    """Generate the input prompt template."""
-    # This is a generic function that works for any language pair
-    # The actual language names will be determined by the dataset_name in the YAML
-    return f"Source sentence: {doc['src_text']}\nTarget sentence:"
-
+def create_doc_to_text_function(src_lang: str, tgt_lang: str) -> Callable:
+    """Create a doc_to_text function for a specific language pair."""
+    lang_names = {
+        'spa': 'Spanish',
+        'por': 'Portuguese', 
+        'eng': 'English',
+        'fra': 'French',
+        'ita': 'Italian',
+        'deu': 'German',
+        'cat': 'Catalan',
+        'eus': 'Basque',
+        'glg': 'Galician',
+    }
+    
+    src_name = lang_names.get(src_lang, src_lang)
+    tgt_name = lang_names.get(tgt_lang, tgt_lang)
+    
+    def doc_to_text(doc):
+        return f"Translate the following sentence from {src_name} to {tgt_name}:\n\n{doc['src_text']}\n\n{tgt_name} translation:"
+    
+    return doc_to_text
 
 def doc_to_target(doc):
     """Generate the target template."""
     return doc['tgt_text']
+
+# Create specific doc_to_text functions for common language pairs
+doc_to_text_eng_to_spa = create_doc_to_text_function('eng', 'spa')
+doc_to_text_spa_to_eng = create_doc_to_text_function('spa', 'eng')
+doc_to_text_spa_to_por = create_doc_to_text_function('spa', 'por')
+doc_to_text_por_to_spa = create_doc_to_text_function('por', 'spa')
+doc_to_text_eng_to_por = create_doc_to_text_function('eng', 'por')
+doc_to_text_por_to_eng = create_doc_to_text_function('por', 'eng')
+
+# Additional language pairs
+doc_to_text_spa_to_fra = create_doc_to_text_function('spa', 'fra')
+doc_to_text_fra_to_spa = create_doc_to_text_function('fra', 'spa')
+doc_to_text_spa_to_ita = create_doc_to_text_function('spa', 'ita')
+doc_to_text_ita_to_spa = create_doc_to_text_function('ita', 'spa')
+doc_to_text_spa_to_deu = create_doc_to_text_function('spa', 'deu')
+doc_to_text_deu_to_spa = create_doc_to_text_function('deu', 'spa')
+doc_to_text_spa_to_cat = create_doc_to_text_function('spa', 'cat')
+doc_to_text_cat_to_spa = create_doc_to_text_function('cat', 'spa')
+doc_to_text_spa_to_eus = create_doc_to_text_function('spa', 'eus')
+doc_to_text_eus_to_spa = create_doc_to_text_function('eus', 'spa')
+doc_to_text_spa_to_glg = create_doc_to_text_function('spa', 'glg')
+doc_to_text_glg_to_spa = create_doc_to_text_function('glg', 'spa')
+
+doc_to_text_por_to_fra = create_doc_to_text_function('por', 'fra')
+doc_to_text_fra_to_por = create_doc_to_text_function('fra', 'por')
+doc_to_text_por_to_ita = create_doc_to_text_function('por', 'ita')
+doc_to_text_ita_to_por = create_doc_to_text_function('ita', 'por')
+doc_to_text_por_to_deu = create_doc_to_text_function('por', 'deu')
+doc_to_text_deu_to_por = create_doc_to_text_function('deu', 'por')
+doc_to_text_por_to_cat = create_doc_to_text_function('por', 'cat')
+doc_to_text_cat_to_por = create_doc_to_text_function('cat', 'por')
+doc_to_text_por_to_eus = create_doc_to_text_function('por', 'eus')
+doc_to_text_eus_to_por = create_doc_to_text_function('eus', 'por')
+doc_to_text_por_to_glg = create_doc_to_text_function('por', 'glg')
+doc_to_text_glg_to_por = create_doc_to_text_function('glg', 'por')
+
+# Default function (English to Spanish)
+def doc_to_text(doc):
+    """Default doc_to_text function for English to Spanish translation."""
+    return doc_to_text_eng_to_spa(doc)

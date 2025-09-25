@@ -101,10 +101,11 @@ def gen_lang_yamls(output_dir: str, overwrite: bool) -> None:
         lang_pair_name = f"{code_to_short_name(src)}-{code_to_short_name(tgt)}"
         yaml_file_name = f"flores_plus_{lang_pair_name}.yaml"
         
-        # Determine the correct process_docs function name
+        # Determine the correct process_docs and doc_to_text function names
         src_short = code_to_short_name(src)
         tgt_short = code_to_short_name(tgt)
         process_docs_func = f"process_docs_{src_short}_to_{tgt_short}"
+        doc_to_text_func = f"doc_to_text_{src_short}_to_{tgt_short}"
         
         try:
             with open(
@@ -118,7 +119,7 @@ def gen_lang_yamls(output_dir: str, overwrite: bool) -> None:
                 outfile.write(f"task: flores_plus_{lang_pair_name}\n")
                 outfile.write(f"dataset_name: {src}\n")
                 outfile.write(f"process_docs: !function utils.{process_docs_func}\n")
-                outfile.write("doc_to_text: !function utils.doc_to_text\n")
+                outfile.write(f"doc_to_text: !function utils.{doc_to_text_func}\n")
                 outfile.write("doc_to_target: !function utils.doc_to_target\n")
                 
         except FileExistsError:

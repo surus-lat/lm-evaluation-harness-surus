@@ -3,5 +3,5 @@ include: _flores_plus_common.yaml
 task: flores_plus_spa-fra
 dataset_name: spa_Latn
 process_docs: !function utils.process_docs_spa_to_fra
-doc_to_text: !function utils.doc_to_text
+doc_to_text: !function utils.doc_to_text_spa_to_fra
 doc_to_target: !function utils.doc_to_target

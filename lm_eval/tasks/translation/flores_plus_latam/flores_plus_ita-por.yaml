@@ -3,5 +3,5 @@ include: _flores_plus_common.yaml
 task: flores_plus_ita-por
 dataset_name: ita_Latn
 process_docs: !function utils.process_docs_ita_to_por
-doc_to_text: !function utils.doc_to_text
+doc_to_text: !function utils.doc_to_text_ita_to_por
 doc_to_target: !function utils.doc_to_target
