@@ -6,10 +6,8 @@ training_split: dev
 validation_split: dev
 test_split: devtest
 fewshot_split: dev
-target_delimiter: ''
 generation_kwargs:
   until:
-    - "\n"
     - "<|endoftext|>"
     - "<|end|>"
   do_sample: false
