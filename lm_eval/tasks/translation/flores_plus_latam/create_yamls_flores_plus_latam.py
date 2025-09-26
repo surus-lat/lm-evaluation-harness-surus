@@ -16,9 +16,9 @@ LATAM_LANGUAGES = [
     "fra_Latn",  # French (for reference)
     "ita_Latn",  # Italian (for reference)
     "deu_Latn",  # German (for reference)
-    "cat_Latn",  # Catalan (for reference)
-    "eus_Latn",  # Basque (for reference)
-    "glg_Latn",  # Galician (for reference)
+    "hin_Deva",  # Indian Hindi (for reference)
+    "cmn_Hans",  # Mandarin Chinese (for reference)
+    "arb_Arab",  # Galician (for reference)
 ]
 
 # Core LATAM languages (Spanish and Portuguese)

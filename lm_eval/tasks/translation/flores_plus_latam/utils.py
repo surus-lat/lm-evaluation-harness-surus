@@ -44,9 +44,9 @@ def create_process_docs_function(target_language: str) -> Callable:
             'fra': 'fra',
             'ita': 'ita',
             'deu': 'deu',
-            'cat': 'cat',
-            'eus': 'eus',
-            'glg': 'glg',
+            'hin': 'hin',
+            'cmn': 'cmn',
+            'arb': 'arb',
         }
         
         # Get the target language ISO code
@@ -104,39 +104,53 @@ def create_process_docs_function(target_language: str) -> Callable:
 
 
 # Create specific process_docs functions for all language pairs
+# Spanish pairs
 process_docs_spa_to_por = create_process_docs_function('por')
-process_docs_por_to_spa = create_process_docs_function('spa')
 process_docs_spa_to_eng = create_process_docs_function('eng')
-process_docs_eng_to_spa = create_process_docs_function('spa')
+process_docs_spa_to_fra = create_process_docs_function('fra')
+process_docs_spa_to_ita = create_process_docs_function('ita')
+process_docs_spa_to_deu = create_process_docs_function('deu')
+process_docs_spa_to_hin = create_process_docs_function('hin')
+process_docs_spa_to_cmn = create_process_docs_function('cmn')
+process_docs_spa_to_arb = create_process_docs_function('arb')
+
+# Portuguese pairs
+process_docs_por_to_spa = create_process_docs_function('spa')
 process_docs_por_to_eng = create_process_docs_function('eng')
+process_docs_por_to_fra = create_process_docs_function('fra')
+process_docs_por_to_ita = create_process_docs_function('ita')
+process_docs_por_to_deu = create_process_docs_function('deu')
+process_docs_por_to_hin = create_process_docs_function('hin')
+process_docs_por_to_cmn = create_process_docs_function('cmn')
+process_docs_por_to_arb = create_process_docs_function('arb')
+
+# English pairs
+process_docs_eng_to_spa = create_process_docs_function('spa')
 process_docs_eng_to_por = create_process_docs_function('por')
 
-# Additional language pairs
-process_docs_spa_to_fra = create_process_docs_function('fra')
+# French pairs
 process_docs_fra_to_spa = create_process_docs_function('spa')
-process_docs_spa_to_ita = create_process_docs_function('ita')
-process_docs_ita_to_spa = create_process_docs_function('spa')
-process_docs_spa_to_deu = create_process_docs_function('deu')
-process_docs_deu_to_spa = create_process_docs_function('spa')
-process_docs_spa_to_cat = create_process_docs_function('cat')
-process_docs_cat_to_spa = create_process_docs_function('spa')
-process_docs_spa_to_eus = create_process_docs_function('eus')
-process_docs_eus_to_spa = create_process_docs_function('spa')
-process_docs_spa_to_glg = create_process_docs_function('glg')
-process_docs_glg_to_spa = create_process_docs_function('spa')
-
-process_docs_por_to_fra = create_process_docs_function('fra')
 process_docs_fra_to_por = create_process_docs_function('por')
-process_docs_por_to_ita = create_process_docs_function('ita')
+
+# Italian pairs
+process_docs_ita_to_spa = create_process_docs_function('spa')
 process_docs_ita_to_por = create_process_docs_function('por')
-process_docs_por_to_deu = create_process_docs_function('deu')
+
+# German pairs
+process_docs_deu_to_spa = create_process_docs_function('spa')
 process_docs_deu_to_por = create_process_docs_function('por')
-process_docs_por_to_cat = create_process_docs_function('cat')
-process_docs_cat_to_por = create_process_docs_function('por')
-process_docs_por_to_eus = create_process_docs_function('eus')
-process_docs_eus_to_por = create_process_docs_function('por')
-process_docs_por_to_glg = create_process_docs_function('glg')
-process_docs_glg_to_por = create_process_docs_function('por')
+
+# Hindi pairs
+process_docs_hin_to_spa = create_process_docs_function('spa')
+process_docs_hin_to_por = create_process_docs_function('por')
+
+# Chinese pairs
+process_docs_cmn_to_spa = create_process_docs_function('spa')
+process_docs_cmn_to_por = create_process_docs_function('por')
+
+# Arabic pairs
+process_docs_arb_to_spa = create_process_docs_function('spa')
+process_docs_arb_to_por = create_process_docs_function('por')
 
 # Default process_docs function (Spanish to Portuguese)
 def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
@@ -153,9 +167,9 @@ def create_doc_to_text_function(src_lang: str, tgt_lang: str) -> Callable:
         'fra': 'French',
         'ita': 'Italian',
         'deu': 'German',
-        'cat': 'Catalan',
-        'eus': 'Basque',
-        'glg': 'Galician',
+        'hin': 'Hindi',
+        'cmn': 'Chinese',
+        'arb': 'Arabic',
     }
     
     src_name = lang_names.get(src_lang, src_lang)
@@ -170,40 +184,54 @@ def doc_to_target(doc):
     """Generate the target template."""
     return doc['tgt_text']
 
-# Create specific doc_to_text functions for common language pairs
-doc_to_text_eng_to_spa = create_doc_to_text_function('eng', 'spa')
-doc_to_text_spa_to_eng = create_doc_to_text_function('spa', 'eng')
+# Create specific doc_to_text functions for all language pairs
+# Spanish pairs
 doc_to_text_spa_to_por = create_doc_to_text_function('spa', 'por')
-doc_to_text_por_to_spa = create_doc_to_text_function('por', 'spa')
-doc_to_text_eng_to_por = create_doc_to_text_function('eng', 'por')
-doc_to_text_por_to_eng = create_doc_to_text_function('por', 'eng')
-
-# Additional language pairs
+doc_to_text_spa_to_eng = create_doc_to_text_function('spa', 'eng')
 doc_to_text_spa_to_fra = create_doc_to_text_function('spa', 'fra')
-doc_to_text_fra_to_spa = create_doc_to_text_function('fra', 'spa')
 doc_to_text_spa_to_ita = create_doc_to_text_function('spa', 'ita')
-doc_to_text_ita_to_spa = create_doc_to_text_function('ita', 'spa')
 doc_to_text_spa_to_deu = create_doc_to_text_function('spa', 'deu')
-doc_to_text_deu_to_spa = create_doc_to_text_function('deu', 'spa')
-doc_to_text_spa_to_cat = create_doc_to_text_function('spa', 'cat')
-doc_to_text_cat_to_spa = create_doc_to_text_function('cat', 'spa')
-doc_to_text_spa_to_eus = create_doc_to_text_function('spa', 'eus')
-doc_to_text_eus_to_spa = create_doc_to_text_function('eus', 'spa')
-doc_to_text_spa_to_glg = create_doc_to_text_function('spa', 'glg')
-doc_to_text_glg_to_spa = create_doc_to_text_function('glg', 'spa')
+doc_to_text_spa_to_hin = create_doc_to_text_function('spa', 'hin')
+doc_to_text_spa_to_cmn = create_doc_to_text_function('spa', 'cmn')
+doc_to_text_spa_to_arb = create_doc_to_text_function('spa', 'arb')
 
+# Portuguese pairs
+doc_to_text_por_to_spa = create_doc_to_text_function('por', 'spa')
+doc_to_text_por_to_eng = create_doc_to_text_function('por', 'eng')
 doc_to_text_por_to_fra = create_doc_to_text_function('por', 'fra')
-doc_to_text_fra_to_por = create_doc_to_text_function('fra', 'por')
 doc_to_text_por_to_ita = create_doc_to_text_function('por', 'ita')
-doc_to_text_ita_to_por = create_doc_to_text_function('ita', 'por')
 doc_to_text_por_to_deu = create_doc_to_text_function('por', 'deu')
+doc_to_text_por_to_hin = create_doc_to_text_function('por', 'hin')
+doc_to_text_por_to_cmn = create_doc_to_text_function('por', 'cmn')
+doc_to_text_por_to_arb = create_doc_to_text_function('por', 'arb')
+
+# English pairs
+doc_to_text_eng_to_spa = create_doc_to_text_function('eng', 'spa')
+doc_to_text_eng_to_por = create_doc_to_text_function('eng', 'por')
+
+# French pairs
+doc_to_text_fra_to_spa = create_doc_to_text_function('fra', 'spa')
+doc_to_text_fra_to_por = create_doc_to_text_function('fra', 'por')
+
+# Italian pairs
+doc_to_text_ita_to_spa = create_doc_to_text_function('ita', 'spa')
+doc_to_text_ita_to_por = create_doc_to_text_function('ita', 'por')
+
+# German pairs
+doc_to_text_deu_to_spa = create_doc_to_text_function('deu', 'spa')
 doc_to_text_deu_to_por = create_doc_to_text_function('deu', 'por')
-doc_to_text_por_to_cat = create_doc_to_text_function('por', 'cat')
-doc_to_text_cat_to_por = create_doc_to_text_function('cat', 'por')
-doc_to_text_por_to_eus = create_doc_to_text_function('por', 'eus')
-doc_to_text_eus_to_por = create_doc_to_text_function('eus', 'por')
-doc_to_text_por_to_glg = create_doc_to_text_function('por', 'glg')
-doc_to_text_glg_to_por = create_doc_to_text_function('glg', 'por')
+
+# Hindi pairs
+doc_to_text_hin_to_spa = create_doc_to_text_function('hin', 'spa')
+doc_to_text_hin_to_por = create_doc_to_text_function('hin', 'por')
+
+# Chinese pairs
+doc_to_text_cmn_to_spa = create_doc_to_text_function('cmn', 'spa')
+doc_to_text_cmn_to_por = create_doc_to_text_function('cmn', 'por')
+
+# Arabic pairs
+doc_to_text_arb_to_spa = create_doc_to_text_function('arb', 'spa')
+doc_to_text_arb_to_por = create_doc_to_text_function('arb', 'por')
 
 # Default function (English to Spanish)
 def doc_to_text(doc):
