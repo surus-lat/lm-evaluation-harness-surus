@@ -1,0 +1,7 @@
+include: _opus_100_common.yaml
+task: opus_100_en-es
+task_alias: en-es
+dataset_name: en-es
+process_docs: !function utils.process_docs_en_es
+doc_to_text: !function utils.doc_to_text_en_es
+doc_to_target: !function utils.doc_to_target
