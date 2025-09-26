@@ -9,9 +9,20 @@ fewshot_split: dev
 generation_kwargs:
   until:
     - "<|endoftext|>"
-    - "<|end|>"
+    - "</s>"
+    - "\n\nTranslate"
+    - "\n\nEnglish"
+    - "\n\nSpanish"
+    - "\n\n\""
   do_sample: false
   temperature: 0.0
+  max_gen_toks: 100
+filter_list:
+  - name: "clean_translation"
+    filter:
+      - function: "regex"
+        regex_pattern: "(.+?)(?:\\n|$)"
+      - function: "take_first"
 metric_list:
   - metric: bleu
     aggregation: bleu

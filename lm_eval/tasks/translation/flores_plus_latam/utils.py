@@ -162,7 +162,7 @@ def create_doc_to_text_function(src_lang: str, tgt_lang: str) -> Callable:
     tgt_name = lang_names.get(tgt_lang, tgt_lang)
     
     def doc_to_text(doc):
-        return f"Translate the following sentence from {src_name} to {tgt_name}:\n\n{doc['src_text']}\n\n{tgt_name} translation:"
+        return f"Translate the following sentence from {src_name} to {tgt_name}:\n\n{doc['src_text']}\n\n{tgt_name} translation: "
     
     return doc_to_text
 
