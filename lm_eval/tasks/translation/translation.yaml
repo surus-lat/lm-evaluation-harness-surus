@@ -1,36 +1,8 @@
 group: translation
 group_alias: translation
 task:
-  - flores_plus_spa-por
-  - flores_plus_por-spa
-  - flores_plus_spa-eng
-  - flores_plus_eng-spa
-  - flores_plus_por-eng
-  - flores_plus_eng-por
-  - flores_plus_spa-fra
-  - flores_plus_fra-spa
-  - flores_plus_por-fra
-  - flores_plus_fra-por
-  - flores_plus_spa-ita
-  - flores_plus_ita-spa
-  - flores_plus_por-ita
-  - flores_plus_ita-por
-  - flores_plus_spa-deu
-  - flores_plus_deu-spa
-  - flores_plus_por-deu
-  - flores_plus_deu-por
-  - flores_plus_spa-cat
-  - flores_plus_cat-spa
-  - flores_plus_por-cat
-  - flores_plus_cat-por
-  - flores_plus_spa-eus
-  - flores_plus_eus-spa
-  - flores_plus_por-eus
-  - flores_plus_eus-por
-  - flores_plus_spa-glg
-  - flores_plus_glg-spa
-  - flores_plus_por-glg
-  - flores_plus_glg-por
+  - flores
+  - opus
 aggregate_metric_list:
   - metric: bleu
     aggregation: mean
