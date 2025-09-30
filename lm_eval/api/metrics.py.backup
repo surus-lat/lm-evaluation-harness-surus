@@ -504,7 +504,7 @@ def bootstrap_stderr(
 
     Executes in parallel unless the env-var `DISABLE_MULTIPROC` is set;
     """
-    if True:  # Force multiprocessing
+    if not os.getenv("DISABLE_MULTIPROC"):
         import multiprocessing as mp
 
         # this gives a biased estimate of the stderr (i.e w/ the mean, it gives something
@@ -518,7 +518,7 @@ def bootstrap_stderr(
         from tqdm import tqdm
 
         print("bootstrapping for stddev:", f.__name__)
-        with mp.Pool(min(24, mp.cpu_count())) as pool:  # Use up to 24 cores
+        with mp.Pool(mp.cpu_count()) as pool:
             for bootstrap in tqdm(
                 pool.imap(
                     _bootstrap_internal(f, chunk_size),

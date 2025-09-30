@@ -41,6 +41,7 @@ dependencies = [
     "more_itertools",
     "sentence-transformers",
     "wandb",
+    "sentencepiece"
 ]
 
 [tool.setuptools.packages.find]
