@@ -20,7 +20,7 @@ def process_docs_en_es(dataset: datasets.Dataset) -> datasets.Dataset:
             'tgt_text': translation['es'],
         }
     
-    return dataset.map(_process_doc)
+    return dataset.map(_process_doc, batched=False, num_proc=4)
 
 
 def process_docs_en_pt(dataset: datasets.Dataset) -> datasets.Dataset:
@@ -37,7 +37,7 @@ def process_docs_en_pt(dataset: datasets.Dataset) -> datasets.Dataset:
             'tgt_text': translation['pt'],
         }
     
-    return dataset.map(_process_doc)
+    return dataset.map(_process_doc, batched=False, num_proc=4)
 
 
 def doc_to_text_en_es(doc):

@@ -1,0 +1,47 @@
+# Optimized FLORES+ translation task with all language pairs in one task
+task: flores_plus_optimized
+task_alias: flores_optimized
+custom_dataset: !function utils.load_optimized_flores_dataset
+output_type: generate_until
+
+# Splits
+training_split: dev
+validation_split: dev
+test_split: devtest
+fewshot_split: dev
+
+# Prompting (dead simple!)
+doc_to_text: !function utils.doc_to_text
+doc_to_target: !function utils.doc_to_target
+
+# Generation settings
+generation_kwargs:
+  until:
+    - "<|endoftext|>"
+    - "</s>"
+    - "\n\nTranslate"
+    - "\n\n"
+    - "Translation:"
+  do_sample: false
+  temperature: 0.0
+  max_gen_toks: 100
+
+# Filtering
+filter_list:
+  - name: "clean_translation"
+    filter:
+      - function: "regex"
+        regex_pattern: "(.+?)(?:\\n|$)"
+      - function: "take_first"
+
+# Metrics - Single score for maximum speed
+metric_list:
+  - metric: chrf
+    aggregation: chrf
+    higher_is_better: true
+
+# Performance optimizations
+metadata:
+  version: 2.0
+  bootstrap_iters: 1000  # Disable bootstrapping for maximum speed
+  description: "Optimized FLORES+ translation task with all LATAM language pairs"
