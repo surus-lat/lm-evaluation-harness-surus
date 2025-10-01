@@ -4,12 +4,6 @@ task:
   - opus_100_en-es
   - opus_100_en-pt
 aggregate_metric_list:
-  - metric: bleu
-    aggregation: mean
-    weight_by_size: false
-  - metric: ter
-    aggregation: mean
-    weight_by_size: false
   - metric: chrf
     aggregation: mean
     weight_by_size: false

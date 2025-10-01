@@ -1,0 +1,47 @@
+# Bidirectional Portuguese ↔ Arabic translation task
+task: flores_arb_por
+task_alias: por↔arb
+custom_dataset: !function utils.load_arb_por
+output_type: generate_until
+
+# Splits
+training_split: dev
+validation_split: dev
+test_split: devtest
+fewshot_split: dev
+
+# Prompting
+doc_to_text: !function utils.doc_to_text
+doc_to_target: !function utils.doc_to_target
+
+# Generation settings
+generation_kwargs:
+  until:
+    - "<|endoftext|>"
+    - "</s>"
+    - "\n\nTranslate"
+    - "\n\n"
+    - "Translation:"
+  do_sample: false
+  temperature: 0.0
+  max_gen_toks: 100
+
+# Filtering
+filter_list:
+  - name: "clean_translation"
+    filter:
+      - function: "regex"
+        regex_pattern: "(.+?)(?:\\n|$)"
+      - function: "take_first"
+
+# Metrics - Single chrF score for speed
+metric_list:
+  - metric: chrf
+    aggregation: chrf
+    higher_is_better: true
+
+# Performance optimizations
+metadata:
+  version: 3.0
+  bootstrap_iters: 0  # Disable bootstrapping for maximum speed
+  description: "Bidirectional Portuguese-Arabic translation task"

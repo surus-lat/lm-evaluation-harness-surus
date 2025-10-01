@@ -1,0 +1,32 @@
+# Group configuration for all bidirectional FLORES+ language pair tasks
+group: flores_plus_bidirectional
+group_alias: flores_bidirectional
+task:
+  # All languages <-> Spanish (8 pairs)
+  - flores_arb_spa
+  - flores_cmn_spa
+  - flores_deu_spa
+  - flores_eng_spa
+  - flores_fra_spa
+  - flores_hin_spa
+  - flores_ita_spa
+  - flores_por_spa
+  
+  # All languages <-> Portuguese (excluding Spanish - already covered) (7 pairs)
+  - flores_arb_por
+  - flores_cmn_por
+  - flores_deu_por
+  - flores_eng_por
+  - flores_fra_por
+  - flores_hin_por
+  - flores_ita_por
+
+aggregate_metric_list:
+  - metric: chrf
+    aggregation: mean
+    weight_by_size: false
+
+metadata:
+  version: 3.0
+  bootstrap_iters: 1000  # Disable bootstrapping for group-level aggregation speed
+  description: "Aggregate benchmark for all bidirectional FLORES+ language pairs"

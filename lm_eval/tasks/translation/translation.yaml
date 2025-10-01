@@ -1,15 +1,9 @@
 group: translation
 group_alias: translation
 task:
-  - flores_plus_optimized
+  - flores_plus_bidirectional
   - opus
 aggregate_metric_list:
-  - metric: bleu
-    aggregation: mean
-    weight_by_size: false
-  - metric: ter
-    aggregation: mean
-    weight_by_size: false
   - metric: chrf
     aggregation: mean
     weight_by_size: false

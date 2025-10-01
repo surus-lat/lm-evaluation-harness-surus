@@ -1,7 +1,7 @@
-# Optimized FLORES+ translation task with all language pairs in one task
-task: flores_plus_optimized
-task_alias: flores_optimized
-custom_dataset: !function utils.load_optimized_flores_dataset
+# Bidirectional Spanish ↔ Hindi translation task
+task: flores_hin_spa
+task_alias: spa↔hin
+custom_dataset: !function utils.load_hin_spa
 output_type: generate_until
 
 # Splits
@@ -10,7 +10,7 @@ validation_split: dev
 test_split: devtest
 fewshot_split: dev
 
-# Prompting (dead simple!)
+# Prompting
 doc_to_text: !function utils.doc_to_text
 doc_to_target: !function utils.doc_to_target
 
@@ -34,7 +34,7 @@ filter_list:
         regex_pattern: "(.+?)(?:\\n|$)"
       - function: "take_first"
 
-# Metrics - Single score for maximum speed
+# Metrics - Single chrF score for speed
 metric_list:
   - metric: chrf
     aggregation: chrf
@@ -42,6 +42,6 @@ metric_list:
 
 # Performance optimizations
 metadata:
-  version: 2.0
-  bootstrap_iters: 1000  # Disable bootstrapping for maximum speed
-  description: "Optimized FLORES+ translation task with all LATAM language pairs"
+  version: 3.0
+  bootstrap_iters: 0  # Disable bootstrapping for maximum speed
+  description: "Bidirectional Spanish-Hindi translation task"

@@ -22,12 +22,6 @@ filter_list:
         regex_pattern: "(.+?)(?:\\n|$)"
       - function: "take_first"
 metric_list:
-  - metric: bleu
-    aggregation: bleu
-    higher_is_better: true
-  - metric: ter
-    aggregation: ter
-    higher_is_better: false
   - metric: chrf
     aggregation: chrf
     higher_is_better: true
