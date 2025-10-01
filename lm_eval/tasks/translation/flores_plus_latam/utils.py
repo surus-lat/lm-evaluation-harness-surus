@@ -10,6 +10,8 @@ import re
 
 # Global cache for the full FLORES+ dataset
 _full_dataset_cache = None
+# Cache for filtered target language datasets per split
+_target_language_cache = {}
 
 def get_full_flores_dataset():
     """Get the full FLORES+ dataset, using cache if available."""
@@ -18,6 +20,30 @@ def get_full_flores_dataset():
         print("Loading full FLORES+ dataset (this will be cached for subsequent tasks)...")
         _full_dataset_cache = datasets.load_dataset('openlanguagedata/flores_plus')
     return _full_dataset_cache
+
+def get_target_language_data(target_language: str, split: str):
+    """Get cached target language data for a specific split."""
+    global _target_language_cache
+    
+    cache_key = f"{target_language}_{split}"
+    if cache_key not in _target_language_cache:
+        print(f"Caching {target_language} data for {split} split...")
+        full_dataset = get_full_flores_dataset()
+        
+        # Map language codes to ISO 639-3 codes
+        lang_to_iso = {
+            'spa': 'spa', 'por': 'por', 'eng': 'eng', 'fra': 'fra',
+            'ita': 'ita', 'deu': 'deu', 'hin': 'hin', 'cmn': 'cmn', 'arb': 'arb',
+        }
+        tgt_iso = lang_to_iso.get(target_language, 'por')
+        
+        # Filter and create lookup once per language-split combination
+        tgt_split = full_dataset[split].filter(lambda x: x['iso_639_3'] == tgt_iso)
+        tgt_lookup = {doc['id']: doc for doc in tgt_split}
+        
+        _target_language_cache[cache_key] = tgt_lookup
+        
+    return _target_language_cache[cache_key]
 
 def create_process_docs_function(target_language: str) -> Callable:
     """
@@ -36,26 +62,6 @@ def create_process_docs_function(target_language: str) -> Callable:
         This function takes a dataset that has already been loaded by the framework
         and processes it to create source-target pairs for translation.
         """
-        # Map language codes to ISO 639-3 codes
-        lang_to_iso = {
-            'spa': 'spa',
-            'por': 'por', 
-            'eng': 'eng',
-            'fra': 'fra',
-            'ita': 'ita',
-            'deu': 'deu',
-            'hin': 'hin',
-            'cmn': 'cmn',
-            'arb': 'arb',
-        }
-        
-        # Get the target language ISO code
-        tgt_iso = lang_to_iso.get(target_language, 'por')
-        
-        
-        # Get the full dataset (cached)
-        full_dataset = get_full_flores_dataset()
-        
         # Get the current split name from the dataset
         # The dataset passed to us is already from a specific split, so we need to 
         # determine which split it came from by looking at the dataset length
@@ -67,12 +73,8 @@ def create_process_docs_function(target_language: str) -> Callable:
             # Fallback to dev if we can't determine
             current_split = 'dev'
         
-        
-        # Filter the full dataset to get only target language documents
-        tgt_split = full_dataset[current_split].filter(lambda x: x['iso_639_3'] == tgt_iso)
-        
-        # Create a lookup dictionary for faster matching
-        tgt_lookup = {doc['id']: doc for doc in tgt_split}
+        # Get cached target language data
+        tgt_lookup = get_target_language_data(target_language, current_split)
         
         
         # Process the dataset to create pairs
@@ -90,13 +92,11 @@ def create_process_docs_function(target_language: str) -> Callable:
                 'tgt_text': tgt_doc['text'],
             }
         
-        # Apply the processing function and filter out None values
-        processed_docs = []
-        for doc in dataset:
-            processed_doc = _process_doc(doc)
-            if processed_doc is not None:
-                processed_docs.append(processed_doc)
-        
+        # Apply the processing function and filter out None values using list comprehension (faster)
+        processed_docs = [
+            processed_doc for doc in dataset 
+            if (processed_doc := _process_doc(doc)) is not None
+        ]
         
         return datasets.Dataset.from_list(processed_docs)
     
