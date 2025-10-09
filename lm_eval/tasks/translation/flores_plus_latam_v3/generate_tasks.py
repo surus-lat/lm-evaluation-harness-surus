@@ -74,7 +74,7 @@ generation_kwargs:
     - "Translation:"
   do_sample: false
   temperature: 0.0
-  max_gen_toks: 100
+  max_gen_toks: 250
 
 # Filtering
 filter_list:
@@ -84,10 +84,13 @@ filter_list:
         regex_pattern: "(.+?)(?:\\\\n|$)"
       - function: "take_first"
 
-# Metrics - Single chrF score for speed
+# Metrics - chrF and BLEU for comprehensive evaluation
 metric_list:
   - metric: chrf
     aggregation: chrf
+    higher_is_better: true
+  - metric: bleu
+    aggregation: bleu
     higher_is_better: true
 
 # Performance optimizations

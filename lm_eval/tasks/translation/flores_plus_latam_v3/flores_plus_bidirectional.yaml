@@ -25,8 +25,13 @@ aggregate_metric_list:
   - metric: chrf
     aggregation: mean
     weight_by_size: false
+    filter_list: ["clean_translation"]
+  - metric: bleu
+    aggregation: mean
+    weight_by_size: false
+    filter_list: ["clean_translation"]
 
 metadata:
   version: 3.0
-  bootstrap_iters: 1000  # Disable bootstrapping for group-level aggregation speed
+  bootstrap_iters: 1000  # Enable bootstrapping for group-level aggregation
   description: "Aggregate benchmark for all bidirectional FLORES+ language pairs"

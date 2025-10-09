@@ -7,6 +7,11 @@ aggregate_metric_list:
   - metric: chrf
     aggregation: mean
     weight_by_size: false
+    filter_list: ["clean_translation"]
+  - metric: bleu
+    aggregation: mean
+    weight_by_size: false
+    filter_list: ["clean_translation"]
 metadata:
   version: 1.0
   bootstrap_iters: 1000  # Enable bootstrapping for group-level aggregation
