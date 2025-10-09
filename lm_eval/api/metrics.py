@@ -12,6 +12,17 @@ import sacrebleu
 
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
+try:
+    from comet import download_model, load_from_checkpoint
+    COMET_AVAILABLE = True
+    # Global COMET model cache
+    _COMET_MODEL = None
+    _COMET_MODEL_PATH = None
+except ImportError:
+    COMET_AVAILABLE = False
+    _COMET_MODEL = None
+    _COMET_MODEL_PATH = None
+
 from lm_eval.api.registry import register_aggregation, register_metric
 
 
@@ -129,6 +140,72 @@ def ter(items):
     preds = list(zip(*items))[1]
     refs, preds = _sacreformat(refs, preds)
     return sacrebleu.corpus_ter(preds, refs).score
+
+
+def _get_comet_model():
+    """Get or initialize the global COMET model."""
+    global _COMET_MODEL, _COMET_MODEL_PATH
+    
+    if not COMET_AVAILABLE:
+        raise ImportError("COMET is not available. Please install it with: pip install unbabel-comet")
+    
+    model_name = "Unbabel/wmt22-comet-da"
+    
+    # Check if we need to load/initialize the model
+    if _COMET_MODEL is None or _COMET_MODEL_PATH != model_name:
+        eval_logger.info(f"Loading COMET model: {model_name}")
+        _COMET_MODEL_PATH = download_model(model_name)
+        _COMET_MODEL = load_from_checkpoint(_COMET_MODEL_PATH)
+        _COMET_MODEL_PATH = model_name
+        eval_logger.info("COMET model loaded successfully (CPU-only mode)")
+    
+    return _COMET_MODEL
+
+
+def clear_comet_cache():
+    """Clear the global COMET model cache to free memory."""
+    global _COMET_MODEL, _COMET_MODEL_PATH
+    _COMET_MODEL = None
+    _COMET_MODEL_PATH = None
+    eval_logger.info("COMET model cache cleared")
+
+
+@register_aggregation("comet")
+def comet(items):
+    """COMET (Crosslingual Optimized Metric for Evaluation of Translation) is a
+    neural metric for machine translation evaluation that uses cross-lingual
+    embeddings to assess translation quality.
+    Source: https://github.com/Unbabel/COMET
+    Paper: https://arxiv.org/abs/2009.09025
+
+    Higher is better
+    """
+    model = _get_comet_model()
+    
+    refs = list(zip(*items))[0]
+    preds = list(zip(*items))[1]
+    docs = list(zip(*items))[2] if len(items[0]) > 2 else None
+    
+    # Format data for COMET
+    data = []
+    for i, (pred, ref) in enumerate(zip(preds, refs)):
+        if docs and i < len(docs):
+            # Use actual source text from document if available
+            doc = docs[i]
+            src_text = doc.get('source_text', ref)  # Fallback to reference if no source
+        else:
+            # Fallback: use reference as source (not ideal but functional)
+            src_text = ref
+            
+        data.append({
+            "src": src_text,
+            "mt": pred,
+            "ref": ref
+        })
+    
+    # Get COMET scores
+    model_output = model.predict(data, batch_size=8, gpus=1)
+    return model_output.system_score
 
 
 @register_aggregation("brier_score")
@@ -358,6 +435,16 @@ def chrf_fn(items):  # This is a passthrough function
     aggregation="ter",
 )
 def ter_fn(items):  # This is a passthrough function
+    return items
+
+
+@register_metric(
+    metric="comet",
+    higher_is_better=True,
+    output_type="generate_until",
+    aggregation="comet",
+)
+def comet_fn(items):  # This is a passthrough function
     return items
 
 

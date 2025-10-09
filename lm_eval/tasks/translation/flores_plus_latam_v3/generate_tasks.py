@@ -84,13 +84,16 @@ filter_list:
         regex_pattern: "(.+?)(?:\\\\n|$)"
       - function: "take_first"
 
-# Metrics - chrF and BLEU for comprehensive evaluation
+# Metrics - chrF, BLEU, and COMET for comprehensive evaluation
 metric_list:
   - metric: chrf
     aggregation: chrf
     higher_is_better: true
   - metric: bleu
     aggregation: bleu
+    higher_is_better: true
+  - metric: comet
+    aggregation: comet
     higher_is_better: true
 
 # Performance optimizations
